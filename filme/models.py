@@ -4,9 +4,9 @@ from django.utils import timezone
 # Create your models here.
 
 LISTA_CATEGORIAS = (
-    ('analises', 'Análises'),
-    ('programacao', 'Programação'),
-    ('apresentacao', 'Apresentação'),
+    ('acao', 'Ação'),
+    ('comedia', 'Comedia'),
+    ('fantasia', 'Fantasia'),
     ('outros', 'Outros'),
 )
 
@@ -22,3 +22,11 @@ class Filme(models.Model):
     def __str__(self):
         return self.titulo
 
+
+class Episodio(models.Model):
+    filme = models.ForeignKey("Filme", related_name="episodios", on_delete=models.CASCADE)
+    titulo = models.CharField(max_length=100)
+    video = models.URLField()
+
+    def __str__(self):
+        return self.filme.titulo + " " + self.titulo
