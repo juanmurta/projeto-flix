@@ -12,5 +12,8 @@ def lista_filmes_emalta(request):
 
 
 def filme_destaque(request):
-    filme = Filme.objects.order_by('-data_criacao')[0]
-    return {"filme_destaque": filme}
+    if Filme.objects.count() == 0:
+        return {"filme_destaque": None}
+    else:
+        filme = Filme.objects.order_by('-data_criacao')[0]
+        return {"filme_destaque": filme}

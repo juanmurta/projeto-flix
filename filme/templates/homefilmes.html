@@ -222,6 +222,48 @@ body {
             <button class="nav-btn next-btn" onclick="scrollCarousel('carousel-emalta', 1)">›</button>
         </div>
     </section>
+
+    <section class="py-8">
+        <div class="carousel-container">
+            <h2 class="section-title">Continuar Assistindo</h2>
+
+            <div class="carousel-items" id="carousel-vistos">
+                <!-- Primeira página -->
+                <div class="carousel-page" id="page1-vistos">
+                    {% for filme in request.user.filmes_vistos.all %}
+                    {% if forloop.counter <= 4 %}
+                    <div class="movie-item">
+                        <a href="{% url 'filme:detalhesfilme' filme.pk %}">
+                            <img src="{{ filme.thumb.url }}" alt="{{ filme.titulo }}">
+                            <div class="movie-title">{{ filme.titulo }}</div>
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+
+                <!-- Segunda página (se existir) -->
+                {% if request.user.filme_vistos.all|length > 4 %}
+                <div class="carousel-page" id="page2-vistos">
+                    {% for filme in request.user.filmes_vistos.all %}
+                    {% if forloop.counter > 4 and forloop.counter <= 8 %}
+                    <div class="movie-item">
+                        <a href="{% url 'filme:detalhesfilme' filme.pk %}">
+                            <img src="{{ filme.thumb.url }}" alt="{{ filme.titulo }}">
+                            <div class="movie-title">{{ filme.titulo }}</div>
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Botões de navegação -->
+            <button class="nav-btn prev-btn" onclick="scrollCarousel('carousel-vistos', -1)">‹</button>
+            <button class="nav-btn next-btn" onclick="scrollCarousel('carousel-vistos', 1)">›</button>
+        </div>
+    </section>
 </main>
 
 <!-- Script de navegação do carrossel -->
@@ -234,16 +276,5 @@ function scrollCarousel(carouselId, direction) {
         behavior: 'smooth'
     });
 }
-
-const nav = document.querySelector('nav');
-document.addEventListener('scroll', e=> {
-    if (window.scrollY > 100) {
-        nav.classList.add('invisible');
-    } else {
-        nav.classList.add('bg-gray-900');
-        nav.classList.remove('invisible');
-    }
-})
-
 </script>
 {% endblock %}

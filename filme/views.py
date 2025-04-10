@@ -38,6 +38,21 @@ class Detalhesfilme(DetailView):
         return context
 
 
+class Pesquisafilme(ListView):
+    template_name = 'pesquisa.html'
+    model = Filme
+
+    def get_queryset(self):
+        termo_pesquisa = self.request.GET.get('query')
+        if termo_pesquisa:
+            # Se o termo de pesquisa não for vazio, filtra os filmes
+            object_list = Filme.objects.filter(titulo__icontains=termo_pesquisa)
+            return object_list
+        else:
+            # Caso contrário, não retorna filme
+            return None
+
+
 # criando view por meio de função, você gerencia tudo e faz manual
 # def homepage(request):
 #     return render(request, 'homepage.html')
