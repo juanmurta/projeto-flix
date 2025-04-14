@@ -1,6 +1,8 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, reverse
 from .models import Filme
-from django.views.generic import TemplateView, ListView, DetailView
+from .forms import CriarContaForm
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 # Create your views here.
@@ -8,14 +10,23 @@ from django.views.generic import TemplateView, ListView, DetailView
 class Homepage(TemplateView):
     template_name = 'homepage.html'
 
+    def get(self, request, *args, **kwargs):
+        # se o usuario estiver logado, redireciona para a homefilmes
+        if request.user.is_authenticated:
+            # redireciona para a homefilmes
+            return redirect('filme:homefilmes')
+        else:
+            # se o usuario não estiver logado, redireciona para a homepage
+            return super().get(request, *args, **kwargs)
 
-class Homefilmes(ListView):
+
+class Homefilmes(LoginRequiredMixin, ListView):
     template_name = 'homefilmes.html'
     model = Filme
     # object_list -> lista de itens do modelo
 
 
-class Detalhesfilme(DetailView):
+class Detalhesfilme(LoginRequiredMixin, DetailView):
     template_name = 'detalhesfilme.html'
     model = Filme
     # object -> 1 item do nosso modelo
@@ -27,8 +38,10 @@ class Detalhesfilme(DetailView):
         filme.visualizacoes += 1
         # salvar o filme no banco de dados
         filme.save()
-
-        return super().get(request, *args, **kwargs) # redireciona o usuario para a url final
+        # adicionar o filme na lista de filmes vistos do usuario
+        usuario = request.user
+        usuario.filmes_vistos.add(filme)
+        return super().get(request, *args, **kwargs)  # redireciona o usuario para a url final
 
     def get_context_data(self, **kwargs):
         context = super(Detalhesfilme, self).get_context_data(**kwargs)
@@ -38,7 +51,7 @@ class Detalhesfilme(DetailView):
         return context
 
 
-class Pesquisafilme(ListView):
+class Pesquisafilme(LoginRequiredMixin, ListView):
     template_name = 'pesquisa.html'
     model = Filme
 
@@ -51,6 +64,27 @@ class Pesquisafilme(ListView):
         else:
             # Caso contrário, não retorna filme
             return None
+
+
+class Paginaperfil(LoginRequiredMixin, TemplateView):
+    template_name = 'editarperfil.html'
+
+
+class Criarconta(FormView):
+    template_name = 'criarconta.html'
+    form_class = CriarContaForm
+
+    def form_valid(self, form):
+        # salva o usuario no banco de dados
+        form.save()
+        # redireciona para a pagina de login
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('filme:login')
+
+
+
 
 
 # criando view por meio de função, você gerencia tudo e faz manual
