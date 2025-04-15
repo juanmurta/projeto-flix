@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
-from .models import Filme
-from .forms import CriarContaForm
+from .models import Filme, Usuario
+from .forms import CriarContaForm, FormHomepage
 from django.views.generic import TemplateView, ListView, DetailView, FormView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 class Homepage(TemplateView):
     template_name = 'homepage.html'
+    form_class = FormHomepage
 
     def get(self, request, *args, **kwargs):
         # se o usuario estiver logado, redireciona para a homefilmes
@@ -18,6 +19,14 @@ class Homepage(TemplateView):
         else:
             # se o usuario não estiver logado, redireciona para a homepage
             return super().get(request, *args, **kwargs)
+
+    def get_success_url(self):
+        email = self.request.POST.get('email')
+        usuarios = Usuario.objects.filter(email=email)
+        if usuarios:
+            return reverse('filme:login')
+        else:
+            return reverse('filme:criarconta')
 
 
 class Homefilmes(LoginRequiredMixin, ListView):

@@ -11,7 +11,7 @@ Criar Conta
         <div class="z-10 h-full py-32 md:py-0 text-gray-50 text-center flex items-center flex-col">
             <form method="post">
                 {% csrf_token %}
-                <fieldset class="form-group">
+                <fieldset class="form-group text-gray-50">
                     <legend class="border-bottom mb-4">Crie uma conta para continuar </legend>
                     {{ form|crispy }}
                 </fieldset>
