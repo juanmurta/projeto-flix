@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, reverse
 from .models import Filme, Usuario
 from .forms import CriarContaForm, FormHomepage
-from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.views.generic import TemplateView, ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 
@@ -19,6 +19,22 @@ class Homepage(TemplateView):
         else:
             # se o usuario não estiver logado, redireciona para a homepage
             return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["form"] = self.form_class()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data.get('email')
+            usuarios = Usuario.objects.filter(email=email)
+            if usuarios:
+                return redirect('filme:login')
+            else:
+                return redirect('filme:criarconta')
+        return render(request, self.template_name, {'form': form})
 
     def get_success_url(self):
         email = self.request.POST.get('email')
@@ -75,8 +91,13 @@ class Pesquisafilme(LoginRequiredMixin, ListView):
             return None
 
 
-class Paginaperfil(LoginRequiredMixin, TemplateView):
+class Paginaperfil(LoginRequiredMixin, UpdateView):
     template_name = 'editarperfil.html'
+    model = Usuario
+    fields = ['first_name', 'last_name', 'email']
+
+    def get_success_url(self):
+        return reverse('filme:homefilmes')
 
 
 class Criarconta(FormView):

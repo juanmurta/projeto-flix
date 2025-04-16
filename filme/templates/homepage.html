@@ -38,14 +38,17 @@
                     <form method="post" class="w-6/12 justify-center">
                         {% csrf_token %}
                         <div class="flex flex-grow items-stretch">
-                            {{ form }}
-                                <input class="bg-gray-50 py-1 px-2 rounded-md text-black" id="id_email">
-                                <button class="bg-red-600 font-medium md:font-normal flex justify-center items-center py-2 px-3 md:px-0 rounded-br-sm rounded-tr-sm md:text-2xl" type="submit">
-                            <span>
-                                Acessar
-                            </span>
-                            <ion-icon name="chevron-forward-outline" class="text-2xl"></ion-icon>
-                        </button>
+                            {% if form.email %}
+                                {{ form.email }}
+                            {% else %}
+                                <input type="email" name="email" required id="id_email" placeholder="Email" class="w-full">
+                            {% endif %}
+                            <button class="bg-red-600 font-medium md:font-normal flex justify-center items-center py-2 px-3 md:px-0 rounded-br-sm rounded-tr-sm md:text-2xl" type="submit">
+                                <span>
+                                    Acessar
+                                </span>
+                                <ion-icon name="chevron-forward-outline" class="text-2xl"></ion-icon>
+                            </button>
                         </div>
                     </form>
                 </div>
