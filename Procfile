@@ -1,1 +1,1 @@
-web: python manage.py migrate && gunicorn jflix.wsgi --log-file -
+web: gunicorn jflix.wsgi --log-file -
