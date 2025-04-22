@@ -103,4 +103,8 @@ If you encounter any issues with static files, try running:
 python manage.py collectstatic
 ```
 
+### Case Sensitivity in Static Files
+
+Heroku's file system is case-sensitive, unlike Windows. Make sure that the file names in your templates match exactly with the actual file names in your static directories, including the correct capitalization. For example, if your file is named `JFlix.png`, referencing it as `jflix.png` or `Jflix.png` will work locally on Windows but fail on Heroku.
+
 For more information on deploying Django applications to Heroku, see the [Heroku Django documentation](https://devcenter.heroku.com/articles/django-app-configuration).
