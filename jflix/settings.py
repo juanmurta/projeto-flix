@@ -10,9 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+import dj_database_url
+from dotenv import load_dotenv
 
 from django.conf.global_settings import STATICFILES_DIRS, MEDIA_URL, AUTH_USER_MODEL
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-m!&27r9z8qhjqvqcls(*wubxb159eo8*#q^no7q7%%s+v4)a4j'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-m!&27r9z8qhjqvqcls(*wubxb159eo8*#q^no7q7%%s+v4)a4j')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ["127.0.0.1", "jflix-f1c5baac021a.herokuapp.com"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "jflix-f1c5baac021a.herokuapp.com"]
 
 
 # Application definition
@@ -46,7 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'white_noise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -87,6 +93,15 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Configure database for Heroku
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES['default'] = dj_database_url.config(
+        default=DATABASE_URL,
+        conn_max_age=600,
+        ssl_require=True
+    )
 
 
 # Password validation
@@ -131,9 +146,16 @@ STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
 
+# WhiteNoise configuration for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 MEDIA_URL = 'media/'
 
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Simplified static file serving for Heroku
+# https://warehouse.python.org/project/whitenoise/
+WHITENOISE_USE_FINDERS = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
